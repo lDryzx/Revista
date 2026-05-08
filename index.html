@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Revista 3D</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --gold: #c9a84c;
+  --gold2: #e8d08a;
+}
+
+html, body {
+  width: 100%; height: 100%;
+  overflow: hidden;
+  background: #070610;
+  font-family: 'Lato', sans-serif;
+  user-select: none;
+}
+
+/* BG */
+#bg {
+  position: fixed; inset: 0; z-index: 0;
+  background: radial-gradient(ellipse at 50% 40%, #1e1830 0%, #0d0b18 60%, #070610 100%);
+}
+
+/* LOADING */
+#loading {
+  position: fixed; inset: 0; z-index: 1000;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px;
+  background: #070610;
+  transition: opacity .5s ease;
+}
+#loading.out { opacity: 0; pointer-events: none; }
+#l-logo {
+  font-family: 'Playfair Display', serif;
+  font-size: 52px; color: var(--gold);
+  letter-spacing: 6px;
+  animation: glow 2s ease-in-out infinite;
+}
+@keyframes glow { 0%,100%{text-shadow:0 0 20px rgba(201,168,76,.4)} 50%{text-shadow:0 0 60px rgba(201,168,76,.8)} }
+#l-sub { font-size: 12px; color: #555; letter-spacing: 3px; text-transform: uppercase; }
+#l-track { width: 220px; height: 2px; background: #1a1a2e; border-radius: 1px; overflow: hidden; }
+#l-fill { height: 100%; width: 0; background: linear-gradient(90deg, var(--gold), var(--gold2)); transition: width .3s; }
+#l-msg { font-size: 12px; color: #444; }
+
+/* UI SHELL */
+#ui {
+  position: fixed; inset: 0; z-index: 10;
+  display: flex; flex-direction: column;
+  opacity: 0; pointer-events: none;
+  transition: opacity .5s ease;
+}
+#ui.visible { opacity: 1; pointer-events: all; }
+
+/* TOP BAR */
+#topbar {
+  height: 52px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 24px;
+  background: linear-gradient(180deg, rgba(7,6,16,.95) 0%, rgba(7,6,16,.5) 100%);
+  border-bottom: 1px solid rgba(201,168,76,.12);
+}
+#logo {
+  font-family: 'Playfair Display', serif;
+  font-size: 18px; color: var(--gold); letter-spacing: 3px;
+}
+#top-ctrls { display: flex; align-items: center; gap: 8px; }
+.cb {
+  background: rgba(255,255,255,.05);
+  border: 1px solid rgba(255,255,255,.1);
+  color: #aaa; border-radius: 7px;
+  padding: 5px 14px; font-size: 12px;
+  cursor: pointer; transition: all .2s;
+  font-family: 'Lato', sans-serif; letter-spacing: .5px;
+}
+.cb:hover { background: rgba(201,168,76,.15); border-color: var(--gold); color: var(--gold); }
+.cb.on    { background: rgba(201,168,76,.2);  border-color: var(--gold); color: var(--gold); }
+.sep { width: 1px; height: 20px; background: rgba(255,255,255,.08); margin: 0 4px; }
+
+/* STAGE */
+#stage {
+  flex: 1; position: relative;
+  display: flex; align-items: center; justify-content: center;
+  perspective: 1400px; overflow: hidden;
+}
+
+/* BOOK */
+#book {
+  position: relative;
+  transform-style: preserve-3d;
+  filter: drop-shadow(0 40px 90px rgba(0,0,0,.95));
+  cursor: grab;
+}
+#book:active { cursor: grabbing; }
+#pages { display: flex; position: relative; transform-style: preserve-3d; }
+
+.pw { position: relative; overflow: hidden; flex-shrink: 0; }
+.pw canvas { display: block; }
+#lw { border-radius: 3px 0 0 3px; box-shadow: -20px 0 60px rgba(0,0,0,.7), inset -3px 0 10px rgba(0,0,0,.4); }
+#rw { border-radius: 0 3px 3px 0; box-shadow:  20px 0 60px rgba(0,0,0,.7), inset  3px 0 10px rgba(0,0,0,.4); }
+
+#spine {
+  position: absolute; top: 0; z-index: 5; pointer-events: none; width: 8px;
+  background: linear-gradient(180deg,
+    rgba(201,168,76,.7) 0%, rgba(70,50,15,.95) 30%,
+    rgba(201,168,76,.5) 50%, rgba(70,50,15,.95) 70%,
+    rgba(201,168,76,.7) 100%
+  );
+}
+#flip-cv { position: absolute; top: 0; left: 0; pointer-events: none; z-index: 20; }
+
+/* SIDE ARROWS */
+.arr {
+  position: absolute; top: 50%; transform: translateY(-50%);
+  z-index: 30; cursor: pointer; padding: 16px;
+  opacity: 0; transition: opacity .3s;
+}
+.arr:hover { opacity: 1; }
+#al { left: 8px; }
+#ar { right: 8px; }
+.arr-c {
+  width: 38px; height: 38px; border-radius: 50%;
+  background: rgba(201,168,76,.1); border: 1px solid rgba(201,168,76,.3);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--gold); font-size: 16px; transition: background .2s;
+}
+.arr:hover .arr-c { background: rgba(201,168,76,.22); }
+
+/* PLACEHOLDER */
+#ph {
+  display: none; flex-direction: column; align-items: center; gap: 12px;
+  color: #2a2a40; pointer-events: none;
+}
+#ph div:first-child  { font-size: 64px; }
+#ph div:nth-child(2) { font-family:'Playfair Display',serif; font-size:22px; color:#383850; }
+#ph div:last-child   { font-size: 13px; }
+
+/* TTS BAR */
+#tts-bar {
+  position: absolute; bottom: 62px; left: 50%; transform: translateX(-50%);
+  background: rgba(8,7,20,.93);
+  border: 1px solid rgba(201,168,76,.25);
+  border-radius: 40px; padding: 8px 20px;
+  display: none; align-items: center; gap: 12px;
+  backdrop-filter: blur(20px);
+  box-shadow: 0 8px 30px rgba(0,0,0,.5);
+  z-index: 50; white-space: nowrap;
+  animation: popUp .25s ease both;
+}
+#tts-bar.show { display: flex; }
+@keyframes popUp { from{opacity:0;transform:translateX(-50%) translateY(8px)} to{opacity:1;transform:translateX(-50%) translateY(0)} }
+.ti { background:none; border:none; color:var(--gold); cursor:pointer; padding:4px; border-radius:5px; transition:all .2s; font-size:16px; }
+.ti:hover { background:rgba(201,168,76,.15); }
+#tts-lbl { font-size:12px; color:#888; min-width:130px; text-align:center; }
+#tts-spd { font-size:11px; color:#666; cursor:pointer; padding:3px 8px; border-radius:4px; border:1px solid rgba(255,255,255,.08); transition:all .2s; }
+#tts-spd:hover { color:var(--gold); border-color:var(--gold); }
+
+/* BOTTOM BAR */
+#bottombar {
+  height: 52px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 24px;
+  background: linear-gradient(0deg, rgba(7,6,16,.95) 0%, rgba(7,6,16,.5) 100%);
+  border-top: 1px solid rgba(255,255,255,.06);
+}
+#nav-l, #nav-r { display: flex; align-items: center; gap: 8px; }
+#nav-c { display: flex; align-items: center; gap: 10px; }
+
+.nb {
+  background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.1);
+  color: #aaa; width: 34px; height: 34px; border-radius: 8px;
+  font-size: 15px; cursor: pointer; transition: all .2s;
+  display: flex; align-items: center; justify-content: center;
+}
+.nb:hover  { background:rgba(201,168,76,.2); border-color:var(--gold); color:var(--gold); transform:scale(1.06); }
+.nb:active { transform:scale(.95); }
+
+#pg-disp {
+  font-size: 13px; color: #777;
+  font-family: 'Playfair Display', serif; letter-spacing: 1px;
+  min-width: 90px; text-align: center;
+}
+#pg-disp span { color: var(--gold); }
+
+#zm-wrap { display: flex; align-items: center; gap: 8px; }
+#zm-r {
+  -webkit-appearance: none; width: 80px; height: 3px;
+  background: rgba(255,255,255,.12); border-radius: 2px; cursor: pointer;
+}
+#zm-r::-webkit-slider-thumb {
+  -webkit-appearance: none; width: 12px; height: 12px;
+  border-radius: 50%; background: var(--gold); cursor: pointer;
+}
+#zm-l { font-size:11px; color:#555; min-width:36px; }
+
+/* TOAST */
+#toast {
+  position: fixed; bottom: 72px; left: 50%; transform: translateX(-50%);
+  background: rgba(10,9,25,.92); border: 1px solid rgba(201,168,76,.2);
+  border-radius: 8px; padding: 8px 18px;
+  font-size: 12px; color: #bbb;
+  z-index: 999; pointer-events: none;
+  opacity: 0; transition: opacity .3s;
+}
+#toast.show { opacity: 1; }
+
+::-webkit-scrollbar { display: none; }
+</style>
+</head>
+<body>
+<div id="bg"></div>
+
+<!-- LOADING -->
+<div id="loading">
+  <div id="l-logo">REVISTA</div>
+  <div id="l-sub">Cargando edición digital</div>
+  <div id="l-track"><div id="l-fill"></div></div>
+  <div id="l-msg">Iniciando…</div>
+</div>
+
+<!-- UI -->
+<div id="ui">
+
+  <!-- TOP -->
+  <div id="topbar">
+    <div id="logo">✦ REVISTA</div>
+    <div id="top-ctrls">
+      <button class="cb" onclick="openFile()">📂 Abrir PDF</button>
+      <div class="sep"></div>
+      <button class="cb" id="btn-view" onclick="toggleView()">📖 Doble página</button>
+      <button class="cb on" id="btn-3d" onclick="toggle3D()">🔄 3D</button>
+      <div class="sep"></div>
+      <button class="cb" id="btn-tts" onclick="toggleTTS()">🔊 Leer</button>
+      <button class="cb" id="btn-auto" onclick="toggleAuto()">⏩ Auto</button>
+      <div class="sep"></div>
+      <button class="cb" onclick="toggleFS()">⛶</button>
+    </div>
+  </div>
+
+  <!-- STAGE -->
+  <div id="stage">
+    <div class="arr" id="al" onclick="prevPage()"><div class="arr-c">&#8592;</div></div>
+    <div class="arr" id="ar" onclick="nextPage()"><div class="arr-c">&#8594;</div></div>
+
+    <div id="book">
+      <div id="pages">
+        <div class="pw" id="lw"><canvas id="cvL"></canvas></div>
+        <div id="spine"></div>
+        <div class="pw" id="rw"><canvas id="cvR"></canvas></div>
+      </div>
+      <canvas id="flip-cv"></canvas>
+    </div>
+
+    <div id="ph">
+      <div>📖</div>
+      <div>Revista Digital 3D</div>
+      <div>Cargando revista.pdf… o abrí un PDF desde arriba</div>
+    </div>
+
+    <!-- TTS -->
+    <div id="tts-bar">
+      <button class="ti" onclick="ttsPrev()">⏮</button>
+      <button class="ti" id="tts-play" onclick="ttsToggle()">▶</button>
+      <button class="ti" onclick="ttsNext()">⏭</button>
+      <div id="tts-lbl">—</div>
+      <span id="tts-spd" onclick="cycleRate()">1×</span>
+      <button class="ti" onclick="closeTTS()">✕</button>
+    </div>
+  </div>
+
+  <!-- BOTTOM -->
+  <div id="bottombar">
+    <div id="nav-l">
+      <button class="nb" onclick="goFirst()">⏮</button>
+      <button class="nb" onclick="prevPage()">◀</button>
+    </div>
+    <div id="nav-c">
+      <div id="pg-disp">pág <span id="cpg">—</span> / <span id="tpg">—</span></div>
+      <div id="zm-wrap">
+        <button class="nb" style="font-size:13px" onclick="zoomOut()">−</button>
+        <input type="range" id="zm-r" min="40" max="250" value="100" oninput="setZoom(this.value)">
+        <button class="nb" style="font-size:13px" onclick="zoomIn()">+</button>
+        <span id="zm-l">100%</span>
+      </div>
+    </div>
+    <div id="nav-r">
+      <button class="nb" onclick="nextPage()">▶</button>
+      <button class="nb" onclick="goLast()">⏭</button>
+    </div>
+  </div>
+
+</div>
+
+<div id="toast"></div>
+
+<script>
+pdfjsLib.GlobalWorkerOptions.workerSrc =
+  'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+// STATE
+let pdf=null, totalPages=0, curPage=1;
+let zoom=1, viewDouble=true, is3D=true;
+let ttsOn=false, autoOn=false, autoTimer=null;
+let rotX=0, rotY=0;
+let dragging=false, dSX=0, dSY=0;
+let pdrag=false, pdSX=0;
+let flipping=false;
+let ttsRates=[.75,1,1.25,1.5,2], ttsRI=1;
+let pageTexts={};
+
+// ELEMENTS
+const $stage  = document.getElementById('stage');
+const $book   = document.getElementById('book');
+const $lw     = document.getElementById('lw');
+const $rw     = document.getElementById('rw');
+const $cvL    = document.getElementById('cvL');
+const $cvR    = document.getElementById('cvR');
+const $spine  = document.getElementById('spine');
+const $flipCv = document.getElementById('flip-cv');
+const $ph     = document.getElementById('ph');
+const $ld     = document.getElementById('loading');
+const $ui     = document.getElementById('ui');
+const $fill   = document.getElementById('l-fill');
+const $lmsg   = document.getElementById('l-msg');
+const $cpg    = document.getElementById('cpg');
+const $tpg    = document.getElementById('tpg');
+const $zmR    = document.getElementById('zm-r');
+const $zmL    = document.getElementById('zm-l');
+const $ttsBar = document.getElementById('tts-bar');
+const $ttsLbl = document.getElementById('tts-lbl');
+const $ttsPlay= document.getElementById('tts-play');
+const $ttsSpd = document.getElementById('tts-spd');
+
+// TOAST
+let tT;
+function toast(m){
+  const e=document.getElementById('toast');
+  e.textContent=m; e.classList.add('show');
+  clearTimeout(tT); tT=setTimeout(()=>e.classList.remove('show'),2200);
+}
+
+// SLEEP
+const sleep = ms => new Promise(r=>setTimeout(r,ms));
+
+// LOAD PDF
+async function loadPDF(src){
+  $lmsg.textContent='Descargando…'; $fill.style.width='10%';
+  try {
+    const task = pdfjsLib.getDocument({
+      url: src,
+      cMapUrl:'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/cmaps/',
+      cMapPacked:true
+    });
+    task.onProgress = ({loaded,total}) => {
+      if(total) $fill.style.width=(10+(loaded/total)*75)+'%';
+    };
+    pdf = await task.promise;
+    totalPages = pdf.numPages;
+    $tpg.textContent = totalPages;
+    $fill.style.width='90%'; $lmsg.textContent='Renderizando…';
+    $ph.style.display='none'; $book.style.display='';
+    await renderSpread(1);
+    $fill.style.width='100%';
+    await sleep(300);
+    $ld.classList.add('out'); $ui.classList.add('visible');
+    setTimeout(()=>$ld.style.display='none',500);
+  } catch(e) {
+    $lmsg.textContent='⚠ No se encontró revista.pdf';
+    $fill.style.background='#c0392b'; $fill.style.width='100%';
+    await sleep(1800);
+    $ld.classList.add('out'); $ui.classList.add('visible');
+    $ph.style.display='flex'; $book.style.display='none';
+    setTimeout(()=>$ld.style.display='none',500);
+  }
+}
+
+// RENDER
+async function renderSpread(pn){
+  if(!pdf) return;
+  curPage = Math.max(1,Math.min(pn,totalPages));
+  $cpg.textContent = curPage;
+
+  const aW = $stage.clientWidth  - 60;
+  const aH = $stage.clientHeight - 20;
+  const refPage = await pdf.getPage(curPage);
+  const nat = refPage.getViewport({scale:1});
+  const cols = viewDouble ? 2 : 1;
+  const sc = Math.min((aW/cols)/nat.width, aH/nat.height, 2) * zoom;
+
+  if(viewDouble){
+    const lp = curPage%2===0 ? curPage-1 : curPage;
+    const rp = lp+1;
+    await renderPage(lp,$cvL,sc);
+    await renderPage(rp,$cvR,sc);
+    $lw.style.display='';
+    $spine.style.display='';
+    const w=$cvL.width, h=$cvL.height;
+    $spine.style.cssText=`left:${w}px;top:0;width:8px;height:${h}px;position:absolute;`;
+    $flipCv.style.cssText=`width:${w*2+8}px;height:${h}px;left:0;top:0;position:absolute;`;
+    $flipCv.width=w*2+8; $flipCv.height=h;
+  } else {
+    $lw.style.display='none'; $spine.style.display='none';
+    await renderPage(curPage,$cvR,sc);
+    const w=$cvR.width, h=$cvR.height;
+    $flipCv.style.cssText=`width:${w}px;height:${h}px;left:0;top:0;position:absolute;`;
+    $flipCv.width=w; $flipCv.height=h;
+  }
+}
+
+async function renderPage(n,cv,sc){
+  if(!pdf||n<1||n>totalPages){cv.width=0;cv.height=0;cv.parentElement.style.width='0';return;}
+  const page=await pdf.getPage(n);
+  const vp=page.getViewport({scale:sc});
+  cv.width=vp.width; cv.height=vp.height;
+  cv.parentElement.style.width=vp.width+'px';
+  cv.parentElement.style.height=vp.height+'px';
+  await page.render({canvasContext:cv.getContext('2d'),viewport:vp}).promise;
+}
+
+// FLIP ANIMATION
+function flipTo(target,dir){
+  if(flipping||!pdf) return;
+  if(target<1||target>totalPages) return;
+  flipping=true;
+  const ctx=$flipCv.getContext('2d');
+  const fW=$flipCv.width, fH=$flipCv.height;
+  const halfW = viewDouble ? fW/2 : fW;
+  const dur=400, t0=performance.now();
+
+  function frame(now){
+    const t=Math.min((now-t0)/dur,1);
+    const ease=t<.5?2*t*t:-1+(4-2*t)*t;
+    ctx.clearRect(0,0,fW,fH);
+    const fx = dir>0 ? halfW*(1-ease) : halfW+halfW*ease;
+
+    // shadow
+    const g=ctx.createLinearGradient(
+      dir>0?fx:fx-60, 0,
+      dir>0?fx+60:fx, 0
+    );
+    g.addColorStop(0,'rgba(0,0,0,0)');
+    g.addColorStop(1,`rgba(0,0,0,${.55*Math.sin(ease*Math.PI)})`);
+    ctx.fillStyle=g;
+    ctx.fillRect(dir>0?fx:fx-60,0,60,fH);
+
+    // gold fold
+    const a=.75*Math.sin(ease*Math.PI);
+    ctx.save();
+    ctx.shadowColor=`rgba(201,168,76,${a*.7})`;
+    ctx.shadowBlur=14;
+    ctx.strokeStyle=`rgba(201,168,76,${a})`;
+    ctx.lineWidth=1.5;
+    ctx.beginPath(); ctx.moveTo(fx,0); ctx.lineTo(fx,fH); ctx.stroke();
+    ctx.restore();
+
+    if(t>=1){ ctx.clearRect(0,0,fW,fH); flipping=false; renderSpread(target); return; }
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+}
+
+// NAV
+function nextPage(){ flipTo(curPage+(viewDouble?2:1), 1); }
+function prevPage(){ flipTo(curPage-(viewDouble?2:1),-1); }
+function goFirst(){ flipTo(1,-1); }
+function goLast() { flipTo(totalPages,1); }
+
+// 3D TILT
+$stage.addEventListener('mousemove',e=>{
+  if(dragging){
+    rotY=Math.max(-35,Math.min(35,rotY+(e.clientX-dSX)*.35));
+    rotX=Math.max(-22,Math.min(22,rotX-(e.clientY-dSY)*.25));
+    dSX=e.clientX; dSY=e.clientY;
+    $book.style.transform=`rotateX(${rotX}deg) rotateY(${rotY}deg)`;
+  } else if(is3D){
+    const r=$stage.getBoundingClientRect();
+    const tx=((e.clientX-r.left-r.width/2)/r.width)*7;
+    const ty=((e.clientY-r.top-r.height/2)/r.height)*-5;
+    $book.style.transform=`rotateX(${ty}deg) rotateY(${tx}deg)`;
+  }
+});
+$stage.addEventListener('mousedown',e=>{
+  if(e.button===0&&e.altKey){ dragging=true; dSX=e.clientX; dSY=e.clientY; $stage.style.cursor='grabbing'; return; }
+  if(e.button===0){ pdrag=true; pdSX=e.clientX; }
+});
+$stage.addEventListener('mouseup',e=>{
+  if(dragging){ dragging=false; $stage.style.cursor=''; }
+  if(pdrag){
+    pdrag=false;
+    const dx=e.clientX-pdSX;
+    if(Math.abs(dx)>70){ dx<0?nextPage():prevPage(); }
+  }
+});
+$stage.addEventListener('mouseleave',()=>{
+  dragging=false; pdrag=false;
+  if(is3D){
+    $book.style.transition='transform .6s ease';
+    $book.style.transform='';
+    setTimeout(()=>$book.style.transition='',600);
+  }
+});
+$stage.addEventListener('touchstart',e=>{ pdSX=e.touches[0].clientX; },{passive:true});
+$stage.addEventListener('touchend',e=>{
+  const dx=e.changedTouches[0].clientX-pdSX;
+  if(Math.abs(dx)>60){ dx<0?nextPage():prevPage(); }
+},{passive:true});
+$stage.addEventListener('wheel',e=>{
+  e.preventDefault();
+  setZoom(Math.max(40,Math.min(250,Math.round(zoom*100)+(e.deltaY>0?-10:10))));
+},{passive:false});
+
+// TOGGLES
+function toggle3D(){
+  is3D=!is3D;
+  document.getElementById('btn-3d').classList.toggle('on',is3D);
+  if(!is3D){ rotX=0;rotY=0;$book.style.transform=''; }
+  toast(is3D?'✦ Efecto 3D activado':'Efecto 3D desactivado');
+}
+function toggleView(){
+  viewDouble=!viewDouble;
+  document.getElementById('btn-view').textContent=viewDouble?'📖 Doble página':'📄 Página simple';
+  if(pdf) renderSpread(curPage);
+}
+function toggleFS(){
+  if(!document.fullscreenElement) document.documentElement.requestFullscreen().catch(()=>{});
+  else document.exitFullscreen();
+}
+function toggleAuto(){
+  autoOn=!autoOn;
+  document.getElementById('btn-auto').classList.toggle('on',autoOn);
+  if(autoOn){
+    autoTimer=setInterval(()=>{ curPage<totalPages?nextPage():stopAuto(); },5000);
+    toast('⏩ Auto-paso activo (5s)');
+  } else stopAuto();
+}
+function stopAuto(){ autoOn=false; clearInterval(autoTimer); document.getElementById('btn-auto').classList.remove('on'); }
+
+// ZOOM
+function setZoom(v){
+  zoom=v/100; $zmL.textContent=v+'%'; $zmR.value=v;
+  if(pdf) renderSpread(curPage);
+}
+function zoomIn() { setZoom(Math.min(250,Math.round(zoom*100)+20)); }
+function zoomOut(){ setZoom(Math.max(40, Math.round(zoom*100)-20)); }
+
+// TTS
+function toggleTTS(){
+  ttsOn=!ttsOn;
+  document.getElementById('btn-tts').classList.toggle('on',ttsOn);
+  $ttsBar.classList.toggle('show',ttsOn);
+  if(ttsOn) startRead(); else { window.speechSynthesis.cancel(); $ttsPlay.textContent='▶'; }
+}
+function closeTTS(){
+  ttsOn=false;
+  document.getElementById('btn-tts').classList.remove('on');
+  $ttsBar.classList.remove('show');
+  window.speechSynthesis.cancel();
+}
+function ttsToggle(){
+  const ss=window.speechSynthesis;
+  if(ss.speaking&&!ss.paused){ ss.pause(); $ttsPlay.textContent='▶'; }
+  else if(ss.paused){ ss.resume(); $ttsPlay.textContent='⏸'; }
+  else startRead();
+}
+function ttsPrev(){ window.speechSynthesis.cancel(); prevPage(); setTimeout(startRead,700); }
+function ttsNext(){ window.speechSynthesis.cancel(); nextPage(); setTimeout(startRead,700); }
+function cycleRate(){
+  ttsRI=(ttsRI+1)%ttsRates.length; $ttsSpd.textContent=ttsRates[ttsRI]+'×';
+  if(window.speechSynthesis.speaking){ window.speechSynthesis.cancel(); setTimeout(startRead,100); }
+}
+async function startRead(){
+  if(!pdf) return;
+  window.speechSynthesis.cancel();
+  if(!pageTexts[curPage]){
+    const pg=await pdf.getPage(curPage);
+    const tc=await pg.getTextContent();
+    pageTexts[curPage]=tc.items.map(i=>i.str).join(' ').trim();
+  }
+  const text=pageTexts[curPage];
+  if(!text){ $ttsLbl.textContent='Sin texto detectado'; return; }
+  $ttsLbl.textContent=`Leyendo pág. ${curPage}…`;
+  const u=new SpeechSynthesisUtterance(text);
+  u.lang='es-AR'; u.rate=ttsRates[ttsRI];
+  u.onstart=()=>$ttsPlay.textContent='⏸';
+  u.onend=()=>{ $ttsPlay.textContent='▶'; $ttsLbl.textContent='Finalizado'; };
+  window.speechSynthesis.speak(u);
+}
+
+// FILE OPEN
+function openFile(){
+  const inp=document.createElement('input');
+  inp.type='file'; inp.accept='.pdf';
+  inp.onchange=e=>{
+    const f=e.target.files[0]; if(!f) return;
+    document.getElementById('logo').textContent='✦ '+f.name.replace('.pdf','').toUpperCase();
+    $book.style.display=''; $ph.style.display='none';
+    loadPDF(URL.createObjectURL(f));
+  };
+  inp.click();
+}
+
+// KEYS
+document.addEventListener('keydown',e=>{
+  if(['ArrowRight','PageDown'].includes(e.key)) nextPage();
+  else if(['ArrowLeft','PageUp'].includes(e.key)) prevPage();
+  else if(e.key==='Home') goFirst();
+  else if(e.key==='End')  goLast();
+  else if(e.key==='+'||e.key==='=') zoomIn();
+  else if(e.key==='-') zoomOut();
+  else if(e.key==='F11'){ e.preventDefault(); toggleFS(); }
+});
+
+window.addEventListener('resize',()=>{ if(pdf) renderSpread(curPage); });
+
+// INIT
+loadPDF('revista.pdf');
+</script>
+</body>
+</html>
