@@ -5,25 +5,19 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>TP N3 — Revista Digital | Colegio Padua</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Raleway:wght@300;400;500;600&family=Cormorant+Garamond:ital,wght@0,300;0,600;1,300&display=swap" rel="stylesheet">
-
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Raleway:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --sky:   #4fc3f7;
-  --sky2:  #81d4fa;
-  --sky3:  #b3e5fc;
-  --diamond: #e0f7fa;
-  --glow:  #00e5ff;
-  --glow2: #40c4ff;
-  --dark:  #050a14;
-  --dark2: #091828;
-  --mid:   #0d2137;
-  --ink:   #1a3a52;
-  --white: #f0faff;
-  --page-w: 420px;
-  --page-h: 560px;
+  --c:   #4fc3f7;
+  --c2:  #81d4fa;
+  --c3:  #b3e5fc;
+  --glow:#00e5ff;
+  --dark:#04090f;
+  --d2:  #071520;
+  --d3:  #0a1e30;
+  --txt: #cce8f4;
 }
 
 html, body {
@@ -31,374 +25,245 @@ html, body {
   overflow: hidden;
   background: var(--dark);
   font-family: 'Raleway', sans-serif;
-  color: var(--white);
-  user-select: none;
+  color: var(--txt);
+  -webkit-user-select: none; user-select: none;
 }
 
-/* ─────────── ANIMATED BG ─────────── */
 #bg {
   position: fixed; inset: 0; z-index: 0;
   background:
-    radial-gradient(ellipse at 20% 20%, rgba(79,195,247,.07) 0%, transparent 60%),
-    radial-gradient(ellipse at 80% 80%, rgba(0,229,255,.06) 0%, transparent 60%),
-    radial-gradient(ellipse at 50% 50%, #091828 0%, #050a14 100%);
+    radial-gradient(ellipse 80% 60% at 15% 15%, rgba(79,195,247,.06) 0%, transparent 70%),
+    radial-gradient(ellipse 70% 50% at 85% 85%, rgba(0,229,255,.05) 0%, transparent 70%),
+    linear-gradient(160deg, #071520 0%, #04090f 60%, #071520 100%);
 }
-
 .star {
-  position: fixed; border-radius: 50%;
-  background: white; pointer-events: none;
-  animation: twinkle var(--d,3s) ease-in-out infinite;
+  position: fixed; border-radius: 50%; background: #fff; pointer-events: none;
+  animation: twk var(--d,3s) ease-in-out infinite;
 }
-@keyframes twinkle {
-  0%,100% { opacity: .15; transform: scale(1); }
-  50%      { opacity: .8;  transform: scale(1.4); }
-}
+@keyframes twk { 0%,100%{opacity:.07} 50%{opacity:.55} }
 
-/* ─────────── LOADING SCREEN ─────────── */
+/* ════ LOADING ════ */
 #loading {
-  position: fixed; inset: 0; z-index: 2000;
-  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0;
-  background: linear-gradient(160deg, #020c1a 0%, #050a14 50%, #020c1a 100%);
-  transition: opacity .8s ease;
+  position: fixed; inset: 0; z-index: 3000;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  background: var(--dark);
+  transition: opacity .7s ease;
 }
-#loading.fade-out { opacity: 0; pointer-events: none; }
+#loading.out { opacity: 0; pointer-events: none; }
 
-.load-emblem {
-  width: 100px; height: 100px; margin-bottom: 28px; position: relative;
-}
-.load-ring {
-  position: absolute; inset: 0; border-radius: 50%;
-  border: 2px solid transparent;
-  border-top-color: var(--sky);
-  animation: spin var(--s,2s) linear infinite;
-}
-.load-ring:nth-child(2) { inset: 10px; border-top-color: var(--glow); --s: 2.8s; }
-.load-ring:nth-child(3) { inset: 20px; border-top-color: var(--sky3); --s: 1.5s; border-top-color: transparent; border-right-color: var(--sky3); }
-.load-core {
-  position: absolute; inset: 30px; border-radius: 50%;
-  background: radial-gradient(circle, rgba(0,229,255,.3), transparent 70%);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 24px; animation: pulse 2s ease-in-out infinite;
-}
-@keyframes spin  { to { transform: rotate(360deg); } }
-@keyframes pulse { 0%,100%{opacity:.5;transform:scale(.9)} 50%{opacity:1;transform:scale(1.1)} }
+.ld-rings { width: 90px; height: 90px; position: relative; margin-bottom: 32px; }
+.ld-ring  { position: absolute; inset: 0; border-radius: 50%; border: 2px solid transparent; }
+.ld-ring:nth-child(1){ border-top-color: var(--c);   animation: sp 2s   linear infinite; }
+.ld-ring:nth-child(2){ inset:12px; border-top-color: var(--glow); animation: sp 2.8s linear infinite reverse; }
+.ld-ring:nth-child(3){ inset:24px; border-right-color: var(--c3); animation: sp 1.5s linear infinite; }
+.ld-core  { position: absolute; inset: 30px; border-radius: 50%;
+            background: radial-gradient(circle, rgba(0,229,255,.3), transparent);
+            animation: pls 2s ease-in-out infinite; }
+@keyframes sp  { to { transform: rotate(360deg); } }
+@keyframes pls { 0%,100%{opacity:.4;transform:scale(.85)} 50%{opacity:1;transform:scale(1.1)} }
 
-.load-school {
-  font-family: 'Cinzel', serif; font-size: 11px;
-  letter-spacing: 5px; color: var(--sky2); text-transform: uppercase;
-  margin-bottom: 6px; opacity: .7;
-}
-.load-title {
-  font-family: 'Cinzel', serif; font-size: 26px; font-weight: 700;
-  background: linear-gradient(135deg, var(--sky3), var(--glow), var(--sky));
-  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-  background-clip: text;
-  letter-spacing: 2px; text-align: center; padding: 0 20px;
-  margin-bottom: 4px;
-  text-shadow: none;
-  filter: drop-shadow(0 0 18px rgba(0,229,255,.5));
-}
-.load-sub {
-  font-size: 12px; color: rgba(79,195,247,.6); letter-spacing: 2px;
-  margin-bottom: 36px;
-}
-.load-bar-wrap {
-  width: 280px; height: 2px;
-  background: rgba(79,195,247,.1); border-radius: 2px; overflow: hidden;
-  margin-bottom: 12px;
-}
-.load-bar {
-  height: 100%; width: 0%;
-  background: linear-gradient(90deg, var(--sky), var(--glow), var(--sky2));
-  border-radius: 2px;
-  box-shadow: 0 0 10px var(--glow);
-  transition: width .4s ease;
-}
-.load-msg { font-size: 11px; color: rgba(79,195,247,.4); letter-spacing: 1px; }
+.ld-school { font-size: 10px; letter-spacing: 5px; color: rgba(79,195,247,.45);
+             text-transform: uppercase; font-weight: 600; margin-bottom: 8px; }
+.ld-title  { font-family: 'Cinzel', serif; font-weight: 700; font-size: 22px;
+             letter-spacing: 1.5px; text-align: center; padding: 0 24px;
+             background: linear-gradient(135deg, var(--c3), var(--glow), var(--c));
+             -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+             filter: drop-shadow(0 0 14px rgba(0,229,255,.4)); margin-bottom: 4px; }
+.ld-sub    { font-size: 11px; color: rgba(79,195,247,.4); letter-spacing: 2px; margin-bottom: 40px; }
+.ld-track  { width: 260px; height: 2px; background: rgba(79,195,247,.1); border-radius: 2px; overflow: hidden; margin-bottom: 12px; }
+.ld-bar    { height: 100%; width: 0%; background: linear-gradient(90deg, var(--c), var(--glow));
+             box-shadow: 0 0 10px var(--glow); transition: width .3s ease; }
+.ld-msg    { font-size: 11px; color: rgba(79,195,247,.35); letter-spacing: 1px; }
 
-/* ─────────── HEADER TITLE ─────────── */
-#header-title {
-  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+/* ════ HEADER ════ */
+#hdr {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 200;
   display: flex; flex-direction: column; align-items: center;
-  padding: 14px 24px 10px;
-  background: linear-gradient(180deg, rgba(5,10,20,.97) 0%, rgba(5,10,20,.6) 100%);
-  border-bottom: 1px solid rgba(79,195,247,.12);
-  backdrop-filter: blur(12px);
+  padding: 10px 180px 8px;
+  background: linear-gradient(180deg, rgba(4,9,15,.96) 0%, rgba(4,9,15,.55) 100%);
+  border-bottom: 1px solid rgba(79,195,247,.1);
+  backdrop-filter: blur(14px);
 }
+.hdr-badge { font-size: 9px; letter-spacing: 5px; color: rgba(79,195,247,.4);
+             text-transform: uppercase; font-weight: 600; margin-bottom: 3px; }
+.hdr-row   { display: flex; align-items: center; gap: 10px; margin-bottom: 2px; }
+.hdr-title { font-family: 'Cinzel', serif; font-weight: 700;
+             font-size: clamp(11px, 1.7vw, 17px);
+             text-align: center; letter-spacing: .8px;
+             background: linear-gradient(90deg, var(--c3) 0%, var(--glow) 30%, var(--c) 60%, var(--c3) 80%, var(--glow) 100%);
+             background-size: 300% 100%;
+             -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+             animation: shim 4s linear infinite;
+             filter: drop-shadow(0 0 10px rgba(0,229,255,.3)); }
+@keyframes shim { 0%{background-position:0%} 100%{background-position:300%} }
+.hdr-gem   { font-size: 9px; color: var(--glow); filter: drop-shadow(0 0 6px var(--glow));
+             animation: gem 2.5s ease-in-out infinite; -webkit-text-fill-color: var(--glow); }
+.hdr-gem:nth-child(3){ animation-delay:.9s; }
+@keyframes gem { 0%,100%{opacity:.3;transform:scale(.7)} 50%{opacity:1;transform:scale(1.3)} }
+.hdr-line  { display: flex; align-items: center; gap: 8px; }
+.hdr-line::before,.hdr-line::after { content:''; display:block; height:1px; width:28px;
+  background: linear-gradient(90deg, transparent, rgba(79,195,247,.4)); }
+.hdr-line::after { background: linear-gradient(90deg, rgba(79,195,247,.4), transparent); }
+.hdr-credits { display: flex; gap: 24px; font-size: 10px; color: rgba(79,195,247,.45); letter-spacing: .8px; }
+.hdr-credits b { color: rgba(129,212,250,.75); font-weight: 600; }
 
-.ht-badge {
-  font-size: 9px; letter-spacing: 4px; color: rgba(79,195,247,.5);
-  text-transform: uppercase; font-family: 'Raleway', sans-serif; font-weight: 600;
-  margin-bottom: 4px;
-}
+.hdr-sparks { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+.sp-pt { position: absolute; border-radius: 50%; width: 2px; height: 2px; background: var(--glow);
+         filter: blur(.5px); animation: spf var(--fd,4s) ease-in-out infinite;
+         opacity: 0; animation-delay: var(--dl,0s); }
+@keyframes spf { 0%{opacity:0;transform:translateY(20px) scale(0)} 40%{opacity:.8} 100%{opacity:0;transform:translateY(-50px) scale(2)} }
 
-.ht-main {
-  font-family: 'Cinzel', serif; font-weight: 700;
-  font-size: clamp(13px, 2.2vw, 20px);
-  text-align: center; line-height: 1.3;
-  background: linear-gradient(135deg, var(--diamond) 0%, var(--glow) 40%, var(--sky2) 70%, var(--diamond) 100%);
-  background-size: 200% 100%;
-  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-  background-clip: text;
-  animation: shimmer 3s linear infinite;
-  filter: drop-shadow(0 0 12px rgba(0,229,255,.35));
-  padding: 0 60px;
-  position: relative;
-}
-@keyframes shimmer { 0%{background-position:0% 50%} 100%{background-position:200% 50%} }
-
-/* diamond sparkles */
-.ht-main::before, .ht-main::after {
-  content: '◆';
-  position: absolute; top: 50%; transform: translateY(-50%);
-  font-size: 10px; -webkit-text-fill-color: var(--sky);
-  filter: drop-shadow(0 0 6px var(--glow));
-  animation: sparkle 2s ease-in-out infinite;
-}
-.ht-main::before { left: 30px; }
-.ht-main::after  { right: 30px; animation-delay: 1s; }
-@keyframes sparkle { 0%,100%{opacity:.4;transform:translateY(-50%) scale(.8)} 50%{opacity:1;transform:translateY(-50%) scale(1.2)} }
-
-/* floating sparkles above title */
-.sparkle-field {
-  position: absolute; top: 0; left: 0; right: 0; height: 100%;
-  pointer-events: none; overflow: hidden;
-}
-.sp {
-  position: absolute; width: 3px; height: 3px; border-radius: 50%;
-  background: var(--glow); filter: blur(.5px);
-  animation: float-sp var(--fd,4s) ease-in-out infinite;
-  opacity: 0;
-}
-@keyframes float-sp {
-  0%   { opacity:0; transform: translateY(30px) scale(0); }
-  30%  { opacity:.9; }
-  100% { opacity:0; transform: translateY(-40px) scale(1.5); }
-}
-
-.ht-credits {
-  display: flex; gap: 28px; margin-top: 5px;
-  font-size: 10px; color: rgba(79,195,247,.55);
-  font-family: 'Raleway', sans-serif; font-weight: 400; letter-spacing: 1px;
-}
-.ht-credits span { display: flex; align-items: center; gap: 5px; }
-.ht-credits b { color: rgba(129,212,250,.8); font-weight: 600; }
-
-/* ─────────── TOOLBAR (bottom of top section) ─────────── */
+/* ════ TOOLBAR ════ */
 #toolbar {
-  position: fixed; z-index: 100;
-  display: flex; align-items: center; gap: 6px;
-  right: 20px; top: 14px;
+  position: fixed; top: 13px; right: 18px; z-index: 300;
+  display: flex; align-items: center; gap: 5px;
 }
-.tb {
-  background: rgba(79,195,247,.07);
-  border: 1px solid rgba(79,195,247,.2);
-  color: rgba(129,212,250,.8); border-radius: 8px;
-  padding: 5px 12px; font-size: 11px; font-weight: 600;
-  cursor: pointer; transition: all .25s;
-  font-family: 'Raleway', sans-serif; letter-spacing: .5px;
-  white-space: nowrap;
-}
-.tb:hover { background: rgba(0,229,255,.15); border-color: var(--glow); color: var(--glow); box-shadow: 0 0 12px rgba(0,229,255,.2); }
-.tb.on    { background: rgba(0,229,255,.2);  border-color: var(--glow); color: var(--glow); box-shadow: 0 0 12px rgba(0,229,255,.25); }
+.tb { background: rgba(79,195,247,.06); border: 1px solid rgba(79,195,247,.18);
+      color: rgba(129,212,250,.7); border-radius: 7px; padding: 5px 12px;
+      font-size: 10px; font-weight: 600; letter-spacing: .8px; text-transform: uppercase;
+      cursor: pointer; transition: all .2s; font-family: 'Raleway', sans-serif; }
+.tb:hover { background: rgba(0,229,255,.14); border-color: var(--glow); color: var(--glow); box-shadow: 0 0 10px rgba(0,229,255,.15); }
+.tb.on    { background: rgba(0,229,255,.18); border-color: var(--glow); color: var(--glow); }
+.tb-sep   { width: 1px; height: 18px; background: rgba(79,195,247,.12); }
 
-/* ─────────── MAIN STAGE ─────────── */
+/* ════ STAGE ════ */
 #stage {
   position: fixed;
-  top: 80px; bottom: 58px; left: 0; right: 0;
+  top: 78px; bottom: 54px; left: 0; right: 0;
   display: flex; align-items: center; justify-content: center;
-  perspective: 1800px;
-  overflow: hidden;
+  perspective: 2200px;
 }
 
-/* ─────────── BOOK WRAPPER ─────────── */
-#book-scene {
-  position: relative;
+/* ════ BOOK ════ */
+#book-scene { transform-style: preserve-3d; transition: transform .08s ease-out; position: relative; }
+#book { display: flex; position: relative; transform-style: preserve-3d; }
+
+.pw { position: relative; flex-shrink: 0; overflow: hidden; background: #ede8dd; }
+#lw { border-radius: 4px 0 0 4px; box-shadow: -10px 0 40px rgba(0,0,0,.7), inset -3px 0 12px rgba(0,0,0,.35); }
+#rw { border-radius: 0 4px 4px 0; box-shadow:  10px 0 40px rgba(0,0,0,.7), inset  3px 0 12px rgba(0,0,0,.35); }
+.pw canvas { display: block; }
+#lw::after { content:''; position:absolute; top:0; right:0; bottom:0; width:32px;
+             background: linear-gradient(to right, transparent, rgba(0,0,0,.22)); pointer-events:none; z-index:2; }
+#rw::after { content:''; position:absolute; top:0; left:0; bottom:0; width:32px;
+             background: linear-gradient(to left, transparent, rgba(0,0,0,.22)); pointer-events:none; z-index:2; }
+
+#spine { width: 10px; flex-shrink: 0; z-index: 5;
+         background: linear-gradient(180deg,
+           rgba(79,195,247,.5) 0%, rgba(10,30,48,.98) 25%,
+           rgba(79,195,247,.25) 50%, rgba(10,30,48,.98) 75%,
+           rgba(79,195,247,.5) 100%);
+         box-shadow: 0 0 18px rgba(0,229,255,.25); }
+
+/* ════ FLIP CARD ════
+   Sits on top of the book in absolute coords.
+   One face = page being turned, other face = destination page (mirrored).
+   CSS rotateY flips it around the spine edge.
+*/
+#flip-card {
+  position: absolute; top: 0;
   transform-style: preserve-3d;
-  transition: transform .05s ease-out;
+  pointer-events: none; z-index: 30;
+  display: none;
 }
-
-#book {
-  position: relative;
-  display: flex; align-items: stretch;
-  transform-style: preserve-3d;
-  filter: drop-shadow(0 50px 100px rgba(0,0,0,.9)) drop-shadow(0 0 30px rgba(0,229,255,.05));
-}
-
-/* LEFT PAGE */
-#lw, #rw {
-  position: relative; overflow: hidden; flex-shrink: 0;
-  background: #f5f0e8;
-}
-#lw { border-radius: 4px 0 0 4px; box-shadow: -8px 0 30px rgba(0,0,0,.6), inset -4px 0 12px rgba(0,0,0,.3); }
-#rw { border-radius: 0 4px 4px 0; box-shadow:  8px 0 30px rgba(0,0,0,.6), inset  4px 0 12px rgba(0,0,0,.3); }
-#lw canvas, #rw canvas { display: block; }
-
-/* PAGE SHADOW overlays */
-#lw::after {
-  content: ''; position: absolute; top: 0; right: 0; bottom: 0; width: 40px;
-  background: linear-gradient(to right, transparent, rgba(0,0,0,.25));
-  pointer-events: none; z-index: 2;
-}
-#rw::after {
-  content: ''; position: absolute; top: 0; left: 0; bottom: 0; width: 40px;
-  background: linear-gradient(to left, transparent, rgba(0,0,0,.25));
-  pointer-events: none; z-index: 2;
-}
-
-/* SPINE */
-#spine {
-  width: 10px; flex-shrink: 0;
-  background: linear-gradient(180deg,
-    rgba(79,195,247,.6) 0%, rgba(13,33,55,.98) 20%,
-    rgba(79,195,247,.3) 50%, rgba(13,33,55,.98) 80%,
-    rgba(79,195,247,.6) 100%);
-  box-shadow: 0 0 20px rgba(0,229,255,.3);
-  z-index: 5;
-}
-
-/* ─────────── 3D FLIP PAGES ─────────── */
-.flip-container {
-  position: absolute; top: 0; z-index: 20;
-  transform-style: preserve-3d;
-  transform-origin: right center;
-  transition: none;
-}
-.flip-container.left-side { transform-origin: right center; }
-.flip-container.right-side { transform-origin: left center; }
-
-.flip-front, .flip-back {
+.fc-face {
   position: absolute; top: 0; left: 0; width: 100%; height: 100%;
   backface-visibility: hidden; -webkit-backface-visibility: hidden;
   overflow: hidden;
 }
-.flip-back { transform: rotateY(180deg); }
+#fc-back { transform: rotateY(180deg); }
 
-/* ─────────── SIDE ARROWS ─────────── */
-.arr {
-  position: absolute; top: 50%; transform: translateY(-50%);
-  z-index: 50; cursor: pointer; padding: 20px;
-  opacity: 0; transition: opacity .3s;
-}
+/* ════ ARROWS ════ */
+.arr { position: absolute; top: 50%; transform: translateY(-50%);
+       z-index: 50; cursor: pointer; padding: 18px;
+       opacity: 0; transition: opacity .25s; }
 #stage:hover .arr { opacity: 1; }
-#al { left: 10px; }
-#ar { right: 10px; }
-.arr-c {
-  width: 44px; height: 44px; border-radius: 50%;
-  background: rgba(0,229,255,.08); border: 1px solid rgba(0,229,255,.25);
-  display: flex; align-items: center; justify-content: center;
-  color: var(--glow); font-size: 18px; transition: all .2s;
-}
-.arr:hover .arr-c { background: rgba(0,229,255,.2); box-shadow: 0 0 20px rgba(0,229,255,.3); transform: scale(1.1); }
+#al { left: 12px; } #ar { right: 12px; }
+.arr-c { width: 42px; height: 42px; border-radius: 50%;
+         background: rgba(0,229,255,.07); border: 1px solid rgba(0,229,255,.22);
+         display: flex; align-items: center; justify-content: center;
+         color: var(--glow); font-size: 18px; transition: all .2s; font-family: monospace; }
+.arr:hover .arr-c { background: rgba(0,229,255,.18); box-shadow: 0 0 18px rgba(0,229,255,.25); transform: scale(1.08); }
 
-/* ─────────── PLACEHOLDER ─────────── */
-#ph {
-  display: none; flex-direction: column; align-items: center; gap: 14px;
-  color: rgba(79,195,247,.3);
-}
-#ph .ph-icon { font-size: 80px; filter: drop-shadow(0 0 20px rgba(0,229,255,.2)); }
-#ph .ph-text { font-family:'Cinzel',serif; font-size:20px; color:rgba(79,195,247,.4); }
-#ph .ph-sub  { font-size:13px; color:rgba(79,195,247,.25); }
+/* placeholder */
+#ph { display: none; flex-direction: column; align-items: center; gap: 14px;
+      color: rgba(79,195,247,.25); font-family: 'Cinzel', serif; text-align: center; padding: 20px; }
+.ph-txt { font-size: 18px; }
+.ph-sub { font-size: 12px; color: rgba(79,195,247,.18); font-family: 'Raleway', sans-serif; }
 
-/* ─────────── BOTTOM BAR ─────────── */
-#bottombar {
-  position: fixed; bottom: 0; left: 0; right: 0; height: 58px; z-index: 100;
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 0 20px;
-  background: linear-gradient(0deg, rgba(5,10,20,.97) 0%, rgba(5,10,20,.6) 100%);
-  border-top: 1px solid rgba(79,195,247,.1);
-  backdrop-filter: blur(12px);
-}
-#nav-l, #nav-r { display: flex; gap: 6px; }
-#nav-c { display: flex; align-items: center; gap: 12px; }
-
-.nb {
-  background: rgba(79,195,247,.07); border: 1px solid rgba(79,195,247,.2);
-  color: rgba(129,212,250,.7); width: 36px; height: 36px; border-radius: 9px;
-  font-size: 14px; cursor: pointer; transition: all .2s;
-  display: flex; align-items: center; justify-content: center;
-}
-.nb:hover  { background: rgba(0,229,255,.18); border-color:var(--glow); color:var(--glow); transform:scale(1.08); box-shadow:0 0 12px rgba(0,229,255,.2); }
+/* ════ BOTTOM BAR ════ */
+#bot { position: fixed; bottom: 0; left: 0; right: 0; height: 54px; z-index: 200;
+       display: flex; align-items: center; justify-content: space-between;
+       padding: 0 18px;
+       background: linear-gradient(0deg, rgba(4,9,15,.97) 0%, rgba(4,9,15,.6) 100%);
+       border-top: 1px solid rgba(79,195,247,.08); backdrop-filter: blur(14px); }
+.nav-g { display: flex; align-items: center; gap: 6px; }
+.nb { background: rgba(79,195,247,.06); border: 1px solid rgba(79,195,247,.18);
+      color: rgba(129,212,250,.65); width: 36px; height: 34px; border-radius: 8px;
+      font-size: 14px; cursor: pointer; transition: all .2s;
+      display: flex; align-items: center; justify-content: center; font-family: monospace; }
+.nb:hover  { background: rgba(0,229,255,.16); border-color:var(--glow); color:var(--glow); transform:scale(1.07); box-shadow:0 0 10px rgba(0,229,255,.18); }
 .nb:active { transform: scale(.94); }
-
-#pg-disp {
-  font-family: 'Cinzel', serif; font-size: 13px; color: rgba(79,195,247,.5);
-  min-width: 110px; text-align: center; letter-spacing: 1px;
-}
-#pg-disp em { color: var(--sky2); font-style: normal; }
-
+#pg-disp { font-family: 'Cinzel', serif; font-size: 12px; color: rgba(79,195,247,.45); letter-spacing: 1px;
+            min-width: 100px; text-align: center; }
+#pg-disp em { color: var(--c2); font-style: normal; }
 #zm-wrap { display: flex; align-items: center; gap: 8px; }
-#zm-r {
-  -webkit-appearance: none; width: 80px; height: 2px;
-  background: rgba(79,195,247,.15); border-radius: 2px; cursor: pointer;
-}
-#zm-r::-webkit-slider-thumb {
-  -webkit-appearance: none; width: 13px; height: 13px;
-  border-radius: 50%; background: var(--glow); cursor: pointer;
-  box-shadow: 0 0 8px var(--glow);
-}
-#zm-lbl { font-size: 11px; color: rgba(79,195,247,.4); min-width: 36px; }
+#zm-r { -webkit-appearance: none; width: 80px; height: 2px;
+         background: rgba(79,195,247,.15); border-radius: 2px; cursor: pointer; }
+#zm-r::-webkit-slider-thumb { -webkit-appearance: none; width: 12px; height: 12px;
+  border-radius: 50%; background: var(--glow); cursor: pointer; box-shadow: 0 0 8px var(--glow); }
+#zm-lbl { font-size: 11px; color: rgba(79,195,247,.35); min-width: 36px; }
+.bot-sep { width: 1px; height: 20px; background: rgba(79,195,247,.1); margin: 0 4px; }
 
-/* ─────────── VIEW MODE INDICATOR ─────────── */
-#view-badge {
-  position: fixed; top: 88px; left: 50%; transform: translateX(-50%);
-  font-size: 10px; letter-spacing: 2px; color: rgba(0,229,255,.3);
-  font-family: 'Raleway', sans-serif; font-weight: 600; text-transform: uppercase;
-  pointer-events: none; z-index: 80; transition: opacity .5s;
-}
-
-/* ─────────── TOAST ─────────── */
-#toast {
-  position: fixed; bottom: 68px; left: 50%; transform: translateX(-50%);
-  background: rgba(5,10,20,.92); border: 1px solid rgba(0,229,255,.2);
-  border-radius: 10px; padding: 9px 20px;
-  font-size: 12px; color: rgba(129,212,250,.8); letter-spacing: .5px;
-  z-index: 999; pointer-events: none;
-  opacity: 0; transition: opacity .3s;
-  box-shadow: 0 4px 24px rgba(0,0,0,.5), 0 0 20px rgba(0,229,255,.08);
-  white-space: nowrap;
-}
+#toast { position: fixed; bottom: 62px; left: 50%; transform: translateX(-50%);
+         background: rgba(4,9,15,.92); border: 1px solid rgba(0,229,255,.2);
+         border-radius: 9px; padding: 8px 18px;
+         font-size: 11px; color: rgba(129,212,250,.8); letter-spacing: .5px;
+         z-index: 999; pointer-events: none; white-space: nowrap;
+         opacity: 0; transition: opacity .3s; box-shadow: 0 4px 24px rgba(0,0,0,.6); }
 #toast.show { opacity: 1; }
-
-::-webkit-scrollbar { display: none; }
 </style>
 </head>
 <body>
-
 <div id="bg"></div>
 
 <!-- LOADING -->
 <div id="loading">
-  <div class="load-emblem">
-    <div class="load-ring"></div>
-    <div class="load-ring"></div>
-    <div class="load-ring"></div>
-    <div class="load-core">📘</div>
+  <div class="ld-rings">
+    <div class="ld-ring"></div><div class="ld-ring"></div>
+    <div class="ld-ring"></div><div class="ld-core"></div>
   </div>
-  <div class="load-school">Colegio Padua — Informática</div>
-  <div class="load-title">TP N3 — Revista Digital</div>
-  <div class="load-sub">con programa ISSUU</div>
-  <div class="load-bar-wrap"><div class="load-bar" id="l-fill"></div></div>
-  <div class="load-msg" id="l-msg">Iniciando visor…</div>
+  <div class="ld-school">Colegio Padua &nbsp;&middot;&nbsp; Informatica</div>
+  <div class="ld-title">TP N3 &mdash; Revista Digital</div>
+  <div class="ld-sub">con programa ISSUU</div>
+  <div class="ld-track"><div class="ld-bar" id="l-fill"></div></div>
+  <div class="ld-msg"  id="l-msg">Iniciando visor&hellip;</div>
 </div>
 
-<!-- HEADER TITLE -->
-<div id="header-title">
-  <div class="sparkle-field" id="spark-field"></div>
-  <div class="ht-badge">Colegio Padua · Informática</div>
-  <div class="ht-main">TP N3 — Desarrollo de Revista Digital con programa ISSUU</div>
-  <div class="ht-credits">
-    <span>🎓 Profesor: <b>Adriano Lanzavecchia</b></span>
-    <span>✏️ Alumno: <b>Jorge Ezequiel Duarte Gimenez</b></span>
+<!-- HEADER -->
+<div id="hdr">
+  <div class="hdr-sparks" id="sparks"></div>
+  <div class="hdr-badge">Colegio Padua &nbsp;&middot;&nbsp; Informatica</div>
+  <div class="hdr-row">
+    <span class="hdr-gem">&#9670;</span>
+    <div class="hdr-title">TP N3 &mdash; Desarrollo de Revista Digital con programa ISSUU</div>
+    <span class="hdr-gem">&#9670;</span>
+  </div>
+  <div class="hdr-line"></div>
+  <div class="hdr-credits">
+    <span>Profesor: <b>Adriano Lanzavecchia</b></span>
+    <span>Alumno: <b>Jorge Ezequiel Duarte Gimenez</b></span>
   </div>
 </div>
 
 <!-- TOOLBAR -->
 <div id="toolbar">
-  <button class="tb on" id="btn-3d" onclick="toggle3D()">⬡ 3D</button>
-  <button class="tb on" id="btn-view" onclick="toggleView()">📖 Doble</button>
-  <button class="tb" id="btn-auto" onclick="toggleAuto()">⏩ Auto</button>
-  <button class="tb" onclick="toggleFS()">⛶</button>
+  <button class="tb on" id="btn-3d"   onclick="toggle3D()">3D</button>
+  <div class="tb-sep"></div>
+  <button class="tb on" id="btn-view" onclick="toggleView()">Doble pagina</button>
+  <div class="tb-sep"></div>
+  <button class="tb"    id="btn-auto" onclick="toggleAuto()">Auto</button>
+  <div class="tb-sep"></div>
+  <button class="tb"                  onclick="toggleFS()">Pantalla completa</button>
 </div>
 
 <!-- STAGE -->
@@ -411,37 +276,39 @@ html, body {
       <div class="pw" id="lw"><canvas id="cvL"></canvas></div>
       <div id="spine"></div>
       <div class="pw" id="rw"><canvas id="cvR"></canvas></div>
+      <!-- Flip card — positioned absolutely inside #book -->
+      <div id="flip-card">
+        <div class="fc-face" id="fc-front"><canvas id="fc-cv-front"></canvas></div>
+        <div class="fc-face" id="fc-back" ><canvas id="fc-cv-back" ></canvas></div>
+      </div>
     </div>
   </div>
 
   <div id="ph">
-    <div class="ph-icon">📖</div>
-    <div class="ph-text">Revista Digital 3D</div>
-    <div class="ph-sub">Cargando revista.pdf…</div>
+    <div class="ph-txt">Revista Digital 3D</div>
+    <div class="ph-sub">Coloca revista.pdf en la misma carpeta y abre este archivo en el navegador</div>
   </div>
 </div>
 
-<!-- VIEW BADGE -->
-<div id="view-badge">Vista doble · 3D activo</div>
-
 <!-- BOTTOM BAR -->
-<div id="bottombar">
-  <div id="nav-l">
-    <button class="nb" onclick="goFirst()" title="Primera página">⏮</button>
-    <button class="nb" onclick="prevPage()" title="Anterior">◀</button>
+<div id="bot">
+  <div class="nav-g">
+    <button class="nb" onclick="goFirst()">&#9198;</button>
+    <button class="nb" onclick="prevPage()">&#9664;</button>
   </div>
-  <div id="nav-c">
-    <div id="pg-disp">pág <em id="cpg">—</em> / <em id="tpg">—</em></div>
+  <div class="nav-g">
+    <div id="pg-disp">pag <em id="cpg">&mdash;</em> / <em id="tpg">&mdash;</em></div>
+    <div class="bot-sep"></div>
     <div id="zm-wrap">
-      <button class="nb" style="font-size:12px" onclick="zoomOut()">−</button>
+      <button class="nb" style="font-size:12px" onclick="zoomOut()">&#8722;</button>
       <input type="range" id="zm-r" min="40" max="250" value="100" oninput="setZoom(this.value)">
-      <button class="nb" style="font-size:12px" onclick="zoomIn()">+</button>
+      <button class="nb" style="font-size:12px" onclick="zoomIn()">&#43;</button>
       <span id="zm-lbl">100%</span>
     </div>
   </div>
-  <div id="nav-r">
-    <button class="nb" onclick="nextPage()" title="Siguiente">▶</button>
-    <button class="nb" onclick="goLast()" title="Última página">⏭</button>
+  <div class="nav-g">
+    <button class="nb" onclick="nextPage()">&#9654;</button>
+    <button class="nb" onclick="goLast()">&#9197;</button>
   </div>
 </div>
 
@@ -451,342 +318,320 @@ html, body {
 pdfjsLib.GlobalWorkerOptions.workerSrc =
   'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
-// ──────────── STARS ────────────
-(function(){
-  for(let i=0;i<60;i++){
-    const s=document.createElement('div');
-    s.className='star';
-    const sz=Math.random()*2+.5;
-    s.style.cssText=`
-      width:${sz}px;height:${sz}px;
-      left:${Math.random()*100}%;top:${Math.random()*100}%;
-      --d:${2+Math.random()*5}s;
-      animation-delay:${Math.random()*5}s;
-      opacity:${Math.random()*.3};
-    `;
-    document.body.appendChild(s);
-  }
-})();
+/* stars */
+for(let i=0;i<55;i++){
+  const s=document.createElement('div'); s.className='star';
+  const z=Math.random()*1.8+.4;
+  s.style.cssText=`width:${z}px;height:${z}px;left:${Math.random()*100}%;top:${Math.random()*100}%;--d:${2+Math.random()*5}s;animation-delay:${Math.random()*6}s;`;
+  document.body.appendChild(s);
+}
+/* header sparkles */
+const SF=document.getElementById('sparks');
+for(let i=0;i<16;i++){
+  const s=document.createElement('div'); s.className='sp-pt';
+  s.style.cssText=`left:${5+Math.random()*90}%;top:${Math.random()*100}%;--fd:${3+Math.random()*5}s;--dl:${Math.random()*7}s;`;
+  SF.appendChild(s);
+}
 
-// ──────────── SPARKLES IN HEADER ────────────
-(function(){
-  const f=document.getElementById('spark-field');
-  for(let i=0;i<14;i++){
-    const s=document.createElement('div');
-    s.className='sp';
-    s.style.cssText=`
-      left:${10+Math.random()*80}%;
-      top:${Math.random()*100}%;
-      --fd:${3+Math.random()*5}s;
-      animation-delay:${Math.random()*6}s;
-      width:${1.5+Math.random()*2.5}px;height:${1.5+Math.random()*2.5}px;
-    `;
-    f.appendChild(s);
-  }
-})();
-
-// ──────────── STATE ────────────
+/* ── STATE ── */
 let pdf=null, totalPages=0, curPage=1;
 let zoom=1, viewDouble=true, is3D=true;
 let autoOn=false, autoTimer=null;
-let rotX=0, rotY=0;
-let isFlipping=false;
-let pdragStart=0, pdragging=false;
+let flipping=false;
+let currentScale=1;
 
-// ──────────── ELEMENTS ────────────
-const $stage   = document.getElementById('stage');
-const $scene   = document.getElementById('book-scene');
-const $book    = document.getElementById('book');
-const $lw      = document.getElementById('lw');
-const $rw      = document.getElementById('rw');
-const $cvL     = document.getElementById('cvL');
-const $cvR     = document.getElementById('cvR');
-const $spine   = document.getElementById('spine');
-const $ph      = document.getElementById('ph');
-const $ld      = document.getElementById('loading');
-const $fill    = document.getElementById('l-fill');
-const $lmsg    = document.getElementById('l-msg');
-const $cpg     = document.getElementById('cpg');
-const $tpg     = document.getElementById('tpg');
-const $zmR     = document.getElementById('zm-r');
-const $zmLbl   = document.getElementById('zm-lbl');
-const $badge   = document.getElementById('view-badge');
+/* ── DOM ── */
+const $stage  =document.getElementById('stage');
+const $scene  =document.getElementById('book-scene');
+const $book   =document.getElementById('book');
+const $lw     =document.getElementById('lw');
+const $rw     =document.getElementById('rw');
+const $cvL    =document.getElementById('cvL');
+const $cvR    =document.getElementById('cvR');
+const $spine  =document.getElementById('spine');
+const $ph     =document.getElementById('ph');
+const $ld     =document.getElementById('loading');
+const $fill   =document.getElementById('l-fill');
+const $lmsg   =document.getElementById('l-msg');
+const $cpg    =document.getElementById('cpg');
+const $tpg    =document.getElementById('tpg');
+const $zmR    =document.getElementById('zm-r');
+const $zmLbl  =document.getElementById('zm-lbl');
+const $fc     =document.getElementById('flip-card');
+const $fcFront=document.getElementById('fc-cv-front');
+const $fcBack =document.getElementById('fc-cv-back');
 
-// ──────────── TOAST ────────────
 let toastT;
-function toast(m) {
+function toast(m){
   const e=document.getElementById('toast');
   e.textContent=m; e.classList.add('show');
   clearTimeout(toastT); toastT=setTimeout(()=>e.classList.remove('show'),2400);
 }
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 
-const sleep = ms => new Promise(r=>setTimeout(r,ms));
-
-// ──────────── LOAD PDF ────────────
-async function loadPDF(src) {
-  $lmsg.textContent='Cargando PDF…'; $fill.style.width='8%';
-  try {
-    const task = pdfjsLib.getDocument({
-      url: src,
-      cMapUrl: 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/cmaps/',
-      cMapPacked: true
-    });
-    task.onProgress = ({loaded,total}) => {
-      if(total) $fill.style.width=(8+(loaded/total)*72)+'%';
-    };
-    pdf = await task.promise;
-    totalPages = pdf.numPages;
-    $tpg.textContent = totalPages;
-    $fill.style.width='85%'; $lmsg.textContent='Renderizando páginas…';
-    $ph.style.display='none'; $book.style.display='flex';
-    await renderSpread(1);
-    $fill.style.width='100%';
-    await sleep(400);
-    $ld.classList.add('fade-out');
-    setTimeout(()=>$ld.style.display='none',800);
-  } catch(e) {
-    $lmsg.textContent='⚠ No se encontró revista.pdf en la misma carpeta';
-    $fill.style.background='#c0392b'; $fill.style.width='100%';
-    await sleep(2000);
-    $ld.classList.add('fade-out');
-    $ph.style.display='flex'; $book.style.display='none';
-    setTimeout(()=>$ld.style.display='none',800);
-  }
+/* ── SCALE ── */
+async function calcScale(){
+  if(!pdf) return 1;
+  const aW=$stage.clientWidth-80, aH=$stage.clientHeight-20;
+  const p=await pdf.getPage(curPage);
+  const nat=p.getViewport({scale:1});
+  const cols=viewDouble?2:1;
+  return Math.min((aW/cols)/nat.width, aH/nat.height, 2)*zoom;
 }
 
-// ──────────── RENDER SPREAD ────────────
-async function renderSpread(pn) {
-  if(!pdf) return;
-  curPage = Math.max(1,Math.min(pn,totalPages));
-  $cpg.textContent = curPage;
-
-  const aW = $stage.clientWidth  - 80;
-  const aH = $stage.clientHeight - 20;
-  const refPage = await pdf.getPage(curPage);
-  const nat = refPage.getViewport({scale:1});
-  const cols = viewDouble ? 2 : 1;
-  const sc = Math.min((aW/cols)/nat.width, aH/nat.height, 2) * zoom;
-
-  if(viewDouble) {
-    const lp = curPage%2===0 ? curPage-1 : curPage;
-    const rp = lp+1;
-    $lw.style.display='';
-    $spine.style.display='';
-    await renderPage(lp,$cvL,sc);
-    await renderPage(rp,$cvR,sc);
-    const h=$cvL.height||$cvR.height;
-    $spine.style.height=h+'px';
-  } else {
-    $lw.style.display='none';
-    $spine.style.display='none';
-    await renderPage(curPage,$cvR,sc);
-  }
-  updateBadge();
-}
-
-async function renderPage(n,cv,sc) {
+/* ── RENDER ONE PAGE onto a canvas wrapper ── */
+async function renderPage(n, cv, sc){
+  const pw=cv.parentElement;
   if(!pdf||n<1||n>totalPages){
-    cv.width=0;cv.height=0;
-    cv.parentElement.style.width='0';cv.parentElement.style.height='0';
+    cv.width=0; cv.height=0;
+    pw.style.width='0'; pw.style.height='0';
     return;
   }
   const page=await pdf.getPage(n);
   const vp=page.getViewport({scale:sc});
   cv.width=vp.width; cv.height=vp.height;
-  cv.parentElement.style.width=vp.width+'px';
-  cv.parentElement.style.height=vp.height+'px';
+  pw.style.width=vp.width+'px'; pw.style.height=vp.height+'px';
   await page.render({canvasContext:cv.getContext('2d'),viewport:vp}).promise;
 }
 
-// ──────────── REAL 3D PAGE FLIP ────────────
-function flipTo(target, dir) {
-  if(isFlipping||!pdf) return;
-  if(target<1||target>totalPages) return;
-  if(target===curPage) return;
-  isFlipping=true;
+/* ── RENDER SPREAD ── */
+async function renderSpread(pn){
+  if(!pdf) return;
+  curPage=Math.max(1,Math.min(pn,totalPages));
+  $cpg.textContent=curPage;
+  currentScale=await calcScale();
 
-  // Determine pages involved
-  const fromL = viewDouble ? (curPage%2===0?curPage-1:curPage) : curPage;
-  const fromR = viewDouble ? fromL+1 : curPage;
-  const toPage = target;
-
-  // Build the flipping panel
-  const w = dir>0 ? ($cvR.width||$cvL.width) : ($cvL.width||$cvR.width);
-  const h = $cvR.height||$cvL.height;
-  if(!w||!h){ isFlipping=false; renderSpread(target); return; }
-
-  // Create flip panel
-  const panel = document.createElement('div');
-  panel.style.cssText=`
-    position:absolute; top:0; width:${w}px; height:${h}px;
-    transform-style:preserve-3d;
-    transform-origin:${dir>0?'left':'right'} center;
-    z-index:30; pointer-events:none;
-  `;
-  if(dir>0) panel.style.left = ($cvL.width+10)+'px'; // right page position
-  else       panel.style.left = '0';
-
-  // Front face — current page being turned
-  const front=document.createElement('canvas');
-  front.width=w; front.height=h;
-  front.style.cssText=`position:absolute;top:0;left:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;`;
-
-  // Back face — what's revealed
-  const back=document.createElement('canvas');
-  back.width=w; back.height=h;
-  back.style.cssText=`position:absolute;top:0;left:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;transform:rotateY(180deg);`;
-
-  panel.appendChild(front);
-  panel.appendChild(back);
-  $book.style.position='relative';
-  $book.appendChild(panel);
-
-  // Copy current content to front
-  const srcCv = dir>0 ? $cvR : $cvL;
-  if(srcCv.width) front.getContext('2d').drawImage(srcCv,0,0);
-
-  // Render destination page to back
-  (async()=>{
-    const destPage = dir>0
-      ? (viewDouble ? toPage+(toPage%2===0?0:0) : toPage)
-      : toPage;
-    const sc = srcCv.width / (await pdf.getPage(Math.min(destPage,totalPages)).getViewport({scale:1})).width;
-    const backPg = await pdf.getPage(Math.min(destPage,totalPages));
-    const vp = backPg.getViewport({scale:sc});
-    back.width=vp.width; back.height=vp.height;
-    await backPg.render({canvasContext:back.getContext('2d'),viewport:vp}).promise;
-    // Mirror it (since it's the back face)
-    const ctx=back.getContext('2d');
-    ctx.save();
-    ctx.globalCompositeOperation='copy';
-    ctx.translate(vp.width,0); ctx.scale(-1,1);
-    ctx.drawImage(back,0,0);
-    ctx.restore();
-
-    // Animate
-    const dur=600, t0=performance.now();
-    const targetRot = dir>0 ? -180 : 180;
-
-    function frame(now){
-      const t=Math.min((now-t0)/dur,1);
-      // Ease in-out cubic
-      const e=t<.5?4*t*t*t:(t-1)*(2*t-2)*(2*t-2)+1;
-      const rot=targetRot*e;
-      panel.style.transform=`rotateY(${rot}deg)`;
-
-      // Dynamic shadow/sheen
-      const progress=Math.abs(rot)/180;
-      const shadowAlpha=Math.sin(progress*Math.PI)*0.5;
-      front.style.filter=`brightness(${1-shadowAlpha*0.6})`;
-      back.style.filter=`brightness(${1-( (1-progress)*0.6 )})`;
-
-      if(t<1){ requestAnimationFrame(frame); return; }
-      panel.remove();
-      isFlipping=false;
-      renderSpread(target);
-    }
-    requestAnimationFrame(frame);
-  })();
+  if(viewDouble){
+    /* Always: even page on left, odd on right.
+       curPage can be either; snap to the pair. */
+    const lp=curPage%2===0?curPage:curPage-1;
+    const rp=lp+1;
+    $lw.style.display=''; $spine.style.display='';
+    await Promise.all([renderPage(lp,$cvL,currentScale), renderPage(rp,$cvR,currentScale)]);
+    const h=Math.max($cvL.height,$cvR.height);
+    $spine.style.height=h+'px';
+  } else {
+    $lw.style.display='none'; $spine.style.display='none';
+    await renderPage(curPage,$cvR,currentScale);
+  }
 }
 
-function nextPage(){ flipTo(curPage+(viewDouble?2:1),  1); }
+/* ── LOAD PDF ── */
+async function loadPDF(src){
+  $lmsg.textContent='Cargando PDF…'; $fill.style.width='8%';
+  try{
+    const task=pdfjsLib.getDocument({
+      url:src,
+      cMapUrl:'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/cmaps/',
+      cMapPacked:true
+    });
+    task.onProgress=({loaded,total})=>{ if(total) $fill.style.width=(8+loaded/total*72)+'%'; };
+    pdf=await task.promise;
+    totalPages=pdf.numPages; $tpg.textContent=totalPages;
+    $fill.style.width='88%'; $lmsg.textContent='Renderizando…';
+    $ph.style.display='none';
+    await renderSpread(1);
+    $fill.style.width='100%';
+    await sleep(350);
+    $ld.classList.add('out');
+    setTimeout(()=>$ld.style.display='none',700);
+  }catch(err){
+    $lmsg.textContent='No se encontro revista.pdf — coloca el PDF en la misma carpeta';
+    $fill.style.background='#7f1d1d'; $fill.style.width='100%';
+    await sleep(2400);
+    $ld.classList.add('out');
+    $ph.style.display='flex'; $book.style.display='none';
+    setTimeout(()=>$ld.style.display='none',700);
+  }
+}
+
+/* ══════════════════════════════════════════
+   3D REAL FLIP
+   Strategy:
+   - Forward (dir=+1): right page peels toward left  → origin = LEFT edge of right page
+   - Backward (dir=-1): left page peels toward right → origin = RIGHT edge of left page
+   The flip card is a separate div positioned exactly over the peeling page.
+   front face = that page's current content
+   back face  = the newly revealed page, drawn mirrored (because backface-visibility flips it back)
+══════════════════════════════════════════ */
+async function flipTo(target, dir){
+  if(flipping||!pdf) return;
+  if(target<1||target>totalPages||target===curPage) return;
+  flipping=true;
+
+  const sc=await calcScale();
+
+  /* Which canvas is the page that peels? */
+  const peelCanvas = (!viewDouble || dir>0) ? $cvR : $cvL;
+  const W=peelCanvas.width, H=peelCanvas.height;
+
+  if(!W||!H){ flipping=false; await renderSpread(target); return; }
+
+  /* Position of the flip card inside #book */
+  const spineW=viewDouble?10:0;
+  const leftPageW=viewDouble?($cvL.width||0):0;
+
+  let cardLeft;
+  if(!viewDouble){
+    cardLeft=0;
+  } else if(dir>0){
+    cardLeft=leftPageW+spineW; /* right page */
+  } else {
+    cardLeft=0;                /* left page  */
+  }
+
+  /* Transform origin: the side closest to the spine */
+  const originSide = dir>0 ? 'left' : 'right';
+
+  /* Style the flip card */
+  $fc.style.cssText=`
+    position:absolute; top:0; left:${cardLeft}px;
+    width:${W}px; height:${H}px;
+    transform-style:preserve-3d;
+    transform-origin:${originSide} center;
+    transform:rotateY(0deg);
+    pointer-events:none; z-index:30; display:block;
+  `;
+
+  /* ── FRONT: copy peeling page ── */
+  $fcFront.width=W; $fcFront.height=H;
+  $fcFront.style.cssText=`position:absolute;top:0;left:0;width:${W}px;height:${H}px;`;
+  $fcFront.getContext('2d').drawImage(peelCanvas,0,0);
+
+  /* ── BACK: render destination page, then mirror ── */
+  $fcBack.width=W; $fcBack.height=H;
+  $fcBack.style.cssText=`position:absolute;top:0;left:0;width:${W}px;height:${H}px;transform:rotateY(180deg);backface-visibility:hidden;-webkit-backface-visibility:hidden;`;
+  $fcFront.style.cssText+='backface-visibility:hidden;-webkit-backface-visibility:hidden;';
+
+  /* Which page number appears on the back face?
+     Going forward: after flip, the new LEFT page appears where right was → new left
+     Going backward: after flip, the new RIGHT page appears where left was → new right */
+  let backNum;
+  if(viewDouble){
+    const tL=target%2===0?target:target-1;
+    const tR=tL+1;
+    backNum = dir>0 ? tL : tR;
+  } else {
+    backNum=target;
+  }
+  backNum=Math.max(1,Math.min(backNum,totalPages));
+
+  /* Render back page to temp canvas */
+  const tmp=document.createElement('canvas');
+  const bPg=await pdf.getPage(backNum);
+  const bVp=bPg.getViewport({scale:sc});
+  tmp.width=bVp.width; tmp.height=bVp.height;
+  await bPg.render({canvasContext:tmp.getContext('2d'),viewport:bVp}).promise;
+
+  /* Mirror-draw: the back face is seen through the card so needs horizontal flip */
+  const bctx=$fcBack.getContext('2d');
+  bctx.save(); bctx.translate(W,0); bctx.scale(-1,1);
+  bctx.drawImage(tmp,0,0,W,H);
+  bctx.restore();
+
+  /* Hide peeling canvas so the card is the only thing on that side */
+  peelCanvas.style.visibility='hidden';
+
+  /* ── ANIMATE ── */
+  const dur=560, t0=performance.now();
+  const endAngle = dir>0 ? -180 : 180;
+
+  function frame(now){
+    const raw=Math.min((now-t0)/dur,1);
+    /* Ease in-out cubic */
+    const t=raw<.5 ? 4*raw*raw*raw : 1-(Math.pow(-2*raw+2,3))/2;
+    const angle=endAngle*t;
+    $fc.style.transform=`rotateY(${angle}deg)`;
+
+    /* Dynamic brightness: dim as face turns away, brighten as back arrives */
+    const progress=Math.abs(angle)/180;
+    if(progress<.5){
+      const d=progress*2;
+      $fcFront.style.filter=`brightness(${1-d*0.5})`;
+      $fcBack.style.filter='brightness(0.05)';
+    } else {
+      const r=(progress-.5)*2;
+      $fcFront.style.filter='brightness(0.05)';
+      $fcBack.style.filter=`brightness(${0.1+r*0.9})`;
+    }
+
+    if(raw<1){ requestAnimationFrame(frame); return; }
+
+    /* Cleanup */
+    $fc.style.display='none';
+    peelCanvas.style.visibility='visible';
+    flipping=false;
+    renderSpread(target);
+  }
+  requestAnimationFrame(frame);
+}
+
+function nextPage(){ flipTo(curPage+(viewDouble?2:1), +1); }
 function prevPage(){ flipTo(curPage-(viewDouble?2:1), -1); }
 function goFirst() { flipTo(1,-1); }
-function goLast()  { flipTo(totalPages,1); }
+function goLast()  { flipTo(totalPages,+1); }
 
-// ──────────── 3D TILT ────────────
-let tiltAnim;
-$stage.addEventListener('mousemove', e=>{
+/* ── 3D TILT ── */
+let tiltRAF;
+$stage.addEventListener('mousemove',e=>{
   if(!is3D) return;
   const r=$stage.getBoundingClientRect();
-  const tx=((e.clientX-r.left-r.width/2) /r.width) *12;
+  const tx=((e.clientX-r.left-r.width/2) /r.width)*13;
   const ty=((e.clientY-r.top -r.height/2)/r.height)*-8;
-  cancelAnimationFrame(tiltAnim);
-  tiltAnim=requestAnimationFrame(()=>{
+  cancelAnimationFrame(tiltRAF);
+  tiltRAF=requestAnimationFrame(()=>{
+    $scene.style.transition='';
     $scene.style.transform=`rotateX(${ty}deg) rotateY(${tx}deg)`;
   });
 });
 $stage.addEventListener('mouseleave',()=>{
   if(!is3D) return;
-  $scene.style.transition='transform .8s cubic-bezier(.25,.46,.45,.94)';
-  $scene.style.transform='rotateX(0deg) rotateY(0deg)';
-  setTimeout(()=>$scene.style.transition='',800);
+  $scene.style.transition='transform .9s cubic-bezier(.25,.46,.45,.94)';
+  $scene.style.transform='rotateX(0) rotateY(0)';
 });
 
-// swipe/drag for page turn
-$stage.addEventListener('mousedown',e=>{ pdragging=true; pdragStart=e.clientX; });
-$stage.addEventListener('mouseup',e=>{
-  if(!pdragging) return; pdragging=false;
-  const dx=e.clientX-pdragStart;
-  if(Math.abs(dx)>70){ dx<0?nextPage():prevPage(); }
-});
-$stage.addEventListener('touchstart',e=>{ pdragStart=e.touches[0].clientX; },{passive:true});
-$stage.addEventListener('touchend',e=>{
-  const dx=e.changedTouches[0].clientX-pdragStart;
-  if(Math.abs(dx)>55){ dx<0?nextPage():prevPage(); }
-},{passive:true});
+/* swipe */
+let swX=0;
+$stage.addEventListener('mousedown', e=>{ swX=e.clientX; });
+$stage.addEventListener('mouseup',   e=>{ const dx=e.clientX-swX; if(Math.abs(dx)>65){ dx<0?nextPage():prevPage(); } });
+$stage.addEventListener('touchstart',e=>{ swX=e.touches[0].clientX; },{passive:true});
+$stage.addEventListener('touchend',  e=>{ const dx=e.changedTouches[0].clientX-swX; if(Math.abs(dx)>55){ dx<0?nextPage():prevPage(); } },{passive:true});
+$stage.addEventListener('wheel',e=>{ e.preventDefault(); setZoom(Math.max(40,Math.min(250,Math.round(zoom*100)+(e.deltaY>0?-10:10)))); },{passive:false});
 
-$stage.addEventListener('wheel',e=>{
-  e.preventDefault();
-  setZoom(Math.max(40,Math.min(250,Math.round(zoom*100)+(e.deltaY>0?-10:10))));
-},{passive:false});
-
-// ──────────── TOGGLES ────────────
+/* ── TOGGLES ── */
 function toggle3D(){
   is3D=!is3D;
   document.getElementById('btn-3d').classList.toggle('on',is3D);
-  if(!is3D){
-    $scene.style.transition='transform .5s ease';
-    $scene.style.transform='';
-    setTimeout(()=>$scene.style.transition='',500);
-  }
-  updateBadge();
-  toast(is3D?'⬡ Efecto 3D activado':'Efecto 3D desactivado');
+  if(!is3D){ $scene.style.transition='transform .5s ease'; $scene.style.transform='rotateX(0) rotateY(0)'; }
+  toast(is3D?'Efecto 3D activado':'Efecto 3D desactivado');
 }
-
 function toggleView(){
   viewDouble=!viewDouble;
   const btn=document.getElementById('btn-view');
-  btn.textContent=viewDouble?'📖 Doble':'📄 Simple';
+  btn.textContent=viewDouble?'Doble pagina':'Pagina simple';
   btn.classList.toggle('on',viewDouble);
   if(pdf) renderSpread(curPage);
-  updateBadge();
 }
-
 function toggleFS(){
   if(!document.fullscreenElement) document.documentElement.requestFullscreen().catch(()=>{});
   else document.exitFullscreen();
 }
-
 function toggleAuto(){
   autoOn=!autoOn;
   document.getElementById('btn-auto').classList.toggle('on',autoOn);
   if(autoOn){
-    autoTimer=setInterval(()=>{ curPage+(viewDouble?2:1)<=totalPages?nextPage():stopAuto(); },5000);
-    toast('⏩ Auto-paso: cada 5 segundos');
+    autoTimer=setInterval(()=>{ const n=curPage+(viewDouble?2:1); n<=totalPages?nextPage():stopAuto(); },5000);
+    toast('Auto activo — cada 5 segundos');
   } else stopAuto();
 }
 function stopAuto(){ autoOn=false; clearInterval(autoTimer); document.getElementById('btn-auto').classList.remove('on'); }
 
-function updateBadge(){
-  const parts=[];
-  if(viewDouble) parts.push('Vista doble');
-  else           parts.push('Vista simple');
-  if(is3D)       parts.push('3D activo');
-  $badge.textContent=parts.join(' · ');
-}
-
-// ──────────── ZOOM ────────────
-function setZoom(v){
-  zoom=v/100; $zmLbl.textContent=v+'%'; $zmR.value=v;
-  if(pdf) renderSpread(curPage);
-}
+function setZoom(v){ zoom=v/100; $zmLbl.textContent=v+'%'; $zmR.value=v; if(pdf) renderSpread(curPage); }
 function zoomIn() { setZoom(Math.min(250,Math.round(zoom*100)+20)); }
 function zoomOut(){ setZoom(Math.max(40, Math.round(zoom*100)-20)); }
 
-// ──────────── KEYBOARD ────────────
 document.addEventListener('keydown',e=>{
-  if(['ArrowRight','PageDown'].includes(e.key)) nextPage();
+  if(['ArrowRight','PageDown'].includes(e.key))   nextPage();
   else if(['ArrowLeft','PageUp'].includes(e.key)) prevPage();
   else if(e.key==='Home') goFirst();
   else if(e.key==='End')  goLast();
@@ -795,9 +640,8 @@ document.addEventListener('keydown',e=>{
   else if(e.key==='F11'){ e.preventDefault(); toggleFS(); }
 });
 
-window.addEventListener('resize',()=>{ if(pdf) renderSpread(curPage); });
+window.addEventListener('resize',()=>{ if(pdf&&!flipping) renderSpread(curPage); });
 
-// ──────────── INIT ────────────
 loadPDF('revista.pdf');
 </script>
 </body>
